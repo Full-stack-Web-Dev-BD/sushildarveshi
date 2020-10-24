@@ -1,0 +1,39 @@
+.sidebar .nav li.active > a:not([data-toggle="collapse"]):before, .off-canvas-sidebar .nav li.active > a:not([data-toggle="collapse"]):before {
+    content: " ";
+    position: absolute;
+    height: 100%;
+    width: 2px;
+    top: 0 !important;
+    background: white;
+    border-radius: 0;
+}
+.sidebar .nav li.active > a:not([data-toggle="collapse"]):before, .off-canvas-sidebar .nav li.active > a:not([data-toggle="collapse"]):before {
+    top: 0;
+    left: 0;
+}
+
+.sidebar .nav li > a, .off-canvas-sidebar .nav li > a {
+    font-size: 14px;
+    padding: 10px 8px;
+    font-weight: 600 !important;
+    text-transform: capitalize;
+}
+.sidebar .sidebar-wrapper, .off-canvas-sidebar .sidebar-wrapper{
+    background-color: gray
+}
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+    color: #525f7f;
+    background-color: white;
+    transition: .5s;
+    font-weight: 600;
+    border: 0;
+    border-color: LightGray;
+    border-bottom: 5px solid;
+}
+.nav-link{
+    cursor: pointer;
+}
+.page-link{
+    color: black !important;
+    padding: 10px 22px !important;
+}
