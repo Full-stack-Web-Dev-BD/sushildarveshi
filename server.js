@@ -124,8 +124,8 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, (req, res) => {
     console.log('Server started on port ', PORT)
-    // mongoos.connect('mongodb+srv://user:user@mern.a77ou.mongodb.net/loadapplication?retryWrites=true&w=majority', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
-        mongoos.connect('mongodb://localhost/sushil', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
+    mongoos.connect('mongodb+srv://user:user@mern.a77ou.mongodb.net/business?retryWrites=true&w=majority', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
+        // mongoos.connect('mongodb://localhost/sushil', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
         if (err) {
             console.log(err)
             return
