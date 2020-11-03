@@ -14,16 +14,17 @@ import {
 import OuterNavbar from "components/Navbars/OuterNavbar";
 import Axios from "axios";
 import { Link } from "react-router-dom";
-import {connect} from 'react-redux'
-import {register} from '../store/actions/authAction'
-
+import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
+import { GOOGLE_CLIENT_ID, FACEBOOK_CLIENT_ID } from "config";
 class Signup extends React.Component {
   state = {
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    err: {}
+    error: {},
+    google: false
   }
 
   componentDidMount() {
@@ -40,28 +41,61 @@ class Signup extends React.Component {
     })
   }
 
-  static getDerivedStateFromProps(nextProps, prevState){
-    if(JSON.stringify(nextProps.auth.error)!==JSON.stringify(prevState.error)){
-      return {
-        error:nextProps.auth.error
-      }
-    }
-    return null
-  }
   submitHandler = (e) => {
     e.preventDefault()
-    let{name, email,password , confirmPassword} =this.state
-    this.props.register(
-      {name,email,password,confirmPassword},
-      this.props.history
-    )
-
+    let { name, email, password, confirmPassword } = this.state
+    let obj = { name, email, password, confirmPassword }
+    Axios.post('/register', obj)
+      .then((res) => {
+        window.location.href = '/login'
+      })
+      .catch(err => {
+        console.log(err.response.data);
+        this.setState({
+          error: err.response.data
+        })
+      })
   }
-
+  responseGoogle = (res) => {
+    console.log(res, ' from google')
+    if (res.profileObj) {
+      Axios.post('/googleLogin', {
+        name: res.profileObj.name,
+        email: res.profileObj.email
+      })
+        .then(response => {
+          window.localStorage.setItem('load-token', response.data.token)
+          window.location.href = '/admin/dashboard'
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    } else {
+      this.setState({ error: { massage: "Try Later" } })
+    }
+  }
+  responseFacebook = (res) => {
+    console.log(res, ' from facebook')
+    if (res.name) {
+      Axios.post('/googleLogin', {
+        name: res.name,
+        email: res.email
+      })
+        .then(response => {
+          window.localStorage.setItem('load-token', response.data.token)
+          window.location.href = '/admin/dashboard'
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    } else {
+      this.setState({ error: { massage: "Try Later" } })
+    }
+  }
   render() {
     return (
       <div>
-        {/* <OuterNavbar /> */}
+        <OuterNavbar />
         <div className="row mt-5">
           <div className="col-md-6 offset-md-3">
             <Col xs="12">
@@ -78,7 +112,7 @@ class Signup extends React.Component {
                   <div className="row">
                     <div className="col-md-6">
                       <Label>Your Name</Label>
-                      <Input className="is-invalid" onChange={(e) => this.changeHandler(e)} type="text" name="name" placeholder="Enter Your Name" />
+                      <Input className="is-invalid" value={this.state.name} onChange={(e) => this.changeHandler(e)} type="text" name="name" placeholder="Enter Your Name" />
 
                       {
                         this.state.error.name ?
@@ -88,7 +122,7 @@ class Signup extends React.Component {
                     </div>
                     <div className="col-md-6">
                       <Label>Your Email</Label>
-                      <Input onChange={(e) => this.changeHandler(e)} type="email" name="email" placeholder="Enter Your Email" />
+                      <Input value={this.state.email} onChange={(e) => this.changeHandler(e)} type="email" name="email" placeholder="Enter Your Email" />
                       {
                         this.state.error.email ?
                           <p className="text-danger text-capitalize"> {this.state.error.email} </p>
@@ -122,7 +156,29 @@ class Signup extends React.Component {
                     </div>
                   </div>
                   <Button onClick={e => { this.submitHandler(e) }} color="info" size="sm" className="mt-3" ><span style={{ fontWeight: '300' }}>Signup</span> </Button>
+                  {
+                    this.state.google ?
+                      <p className="text-info mt-5 text-center  text-capitalize">Please give password for confirm Sign up with Google  </p>
+                      : ''
+                  }
                   <p className="mt-3 text-center">Already have account ? <Link to='/login'>Login page. </Link> </p>
+                  <div className="text-center">
+                    <GoogleLogin
+                      style={{marginBottom:'30px'}}
+                      clientId={GOOGLE_CLIENT_ID}
+                      buttonText="Sign up with Google "
+                      onSuccess={this.responseGoogle}
+                      onFailure={this.responseGoogle}
+                      cookiePolicy={'single_host_origin'}
+                    />
+                    <div className="p-2"></div>
+                    <FacebookLogin
+                      appId={FACEBOOK_CLIENT_ID}
+                      autoLoad={false}
+                      fields="name,email,picture"
+                      onClick={() => { console.log('clicked') }}
+                      callback={this.responseFacebook} />
+                  </div>
                 </CardBody>
               </Card>
             </Col>
@@ -132,7 +188,4 @@ class Signup extends React.Component {
     );
   }
 }
-const mapStateToProps=state=>({
-  auth:state.auth
-})
-export default connect(mapStateToProps ,{register} )( Signup);
+export default Signup

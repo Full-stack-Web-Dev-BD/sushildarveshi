@@ -10,14 +10,11 @@ const userRouter = require('./router/userRouter')
 const transection = require('./router/transection')
 const path = require('path')
 const userModel = require('./model/userModel')
-const xlsxj = require("xlsx-to-json");
-var XLSX = require('xlsx');
-const Transection = require('./model/Transection')
+const morgan=require('morgan')
 
 
 
-
-
+app.use(morgan('dev'))
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -25,7 +22,7 @@ app.use(bodyParser.json())
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './client/uploads/')
+        cb(null, './client/public/uploads')
     },
     filename: function (req, file, cb) {
         cb(null, Date.now().toString() + file.originalname)
@@ -76,46 +73,7 @@ app.post('/uploadPP', upload.single('file'), (req, res) => {
         })
 })
 
-app.post('/import-data-from-xlsx', upload2.single('file'), (req, res) => {
-    var workbook = XLSX.readFile(`./uploads/${req.file.filename}`,{cellDates:true});
-    var sheet_name_list = workbook.SheetNames;
-    let result=XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]])
-
-    async function importToDB() {
-        let pushDb = result.map(async element => {
-
-            // let validDate = `${ind[1] + '/' + ind[0] + '/' + ind[2]}`
-            // let validDate = `${ind[1] + '/' + ind[0] + '/' + ind[2]}`
-            await new Transection({
-                insertDate: element['insert date'],
-                product: element.product,
-                brand: element.brand,
-                category: element.category,
-                description: element.description,
-                rating: element.rating,
-                sellerInformation: element['seller information'],
-                currentPrice: element['current price'],
-                currentPriceDate: element['current price date'],
-                oldPrice: element['old price'],
-                oldPriceDate: element['old price date'],
-                priceChange: element['price change %'],
-                url: element.url,
-            })
-                .save()
-                .then(doc => {
-                    // console.log('added');
-                })
-                .catch(err => {
-                    return console.log(err);
-                })
-        })
-        await Promise.all(pushDb)
-        // console.log('done');
-        return res.status(200).json({ message: "Uploaded" })
-    }
-    importToDB()
-})
-
+app.use("/uploads", express.static("uploads"));
 
 app.use(express.static(path.join(__dirname, './client/build')));
 app.get('*', (req, res) => {
@@ -124,8 +82,8 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, (req, res) => {
     console.log('Server started on port ', PORT)
-    mongoos.connect('mongodb+srv://user:user@mern.a77ou.mongodb.net/business?retryWrites=true&w=majority', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
-        // mongoos.connect('mongodb://localhost/sushil', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
+    // mongoos.connect('mongodb+srv://user:user@mern.a77ou.mongodb.net/app-db?retryWrites=true&w=majority', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
+        mongoos.connect('mongodb://localhost/hn5', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
         if (err) {
             console.log(err)
             return

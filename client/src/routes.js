@@ -1,12 +1,19 @@
+import JwtDecode from "jwt-decode";
 import Dashboard from "views/Dashboard.js";
 import Icons from "views/Icons.js";
-import Notifications from "views/Notifications.js";
+import ImportData from "views/ImportData";
 import TableList from "views/TableList.js";
 import Transection from "views/Transection";
-import Typography from "views/Typography.js";
 import UserProfile from "views/UserProfile.js";
+import Users from "views/Users";
 
-var routes = [
+const token = window.localStorage.getItem('load-token')
+
+let user = token?  JwtDecode(token):{}
+
+
+var userRoute = [
+  
   {
     path: "/dashboard",
     name: "Home",
@@ -22,13 +29,6 @@ var routes = [
     component: UserProfile,
     layout: "/admin"
   },
-  // {
-  //   path: "/notifications",
-  //   name: "Notifications",
-  //   icon: "tim-icons icon-bell-55",
-  //   component: Notifications,
-  //   layout: "/admin"
-  // },
   {
     path: "/create",
     name: "Transection",
@@ -42,20 +42,40 @@ var routes = [
     icon: "tim-icons icon-notes",
     component: TableList,
     layout: "/admin"
-  },
+  }
+];
+var adminRoute = [
   {
-    path: "/icons",
-    name: "Test Page 1",
-    icon: "tim-icons icon-atom",
-    component: Icons,
+    path: "/users",
+    name: "Users",
+    icon: "tim-icons icon-settings-gear-63",
+    component: Users,
     layout: "/admin"
   },
+  {
+    path: "/tables",
+    name: "View & Manage",
+    icon: "tim-icons icon-notes",
+    component: TableList,
+    layout: "/admin"
+  },
+  {
+    path: "/profile",
+    name: "Profile ",
+    icon: "tim-icons icon-single-02",
+    component: UserProfile,
+    layout: "/admin"
+  },
+
   // {
-  //   path: "/typography",
-  //   name: "test page 2",
-  //   icon: "tim-icons icon-align-center",
-  //   component: Typography,
+  //   path: "/icons",
+  //   name: "Test Page 1",
+  //   icon: "tim-icons icon-atom",
+  //   component: Icons,
   //   layout: "/admin"
-  // }
+  // },
 ];
-export default routes;
+
+
+
+export default user.type == 'admin' || user.type == 'Admin'? adminRoute :userRoute;

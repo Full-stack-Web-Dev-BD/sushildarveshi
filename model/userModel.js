@@ -8,6 +8,9 @@ const userSchema=new Schema({
     type:String,
     pp:String,
     aboutMe:String,
+    google:Boolean,
+    facebook:Boolean,
+    access:Boolean
 })
 
 

@@ -90,8 +90,7 @@ class Sidebar extends React.Component {
       <div className="sidebar" data={bgColor}>
         <div className="sidebar-wrapper" ref="sidebar">
           {logoImg !== null || logoText !== null ? (
-            <div className="logo">
-              {logoImg}
+            <div className="logo text-center">
               {logoText}
             </div>
           ) : null}
@@ -122,13 +121,6 @@ class Sidebar extends React.Component {
             <li
               className="active-pro"
             >
-              {/* <ReactstrapNavLink
-                href="/admin/dashboard"
-                style={{display:'flex'}}
-              >
-                <img src={logo.loadingSrc} alt="load" style={{width:'80px',height:'80px'}} />
-                <p style={{lineHeight:'80px' ,fontSize:'22px ',fontWeight:'500'}}>{logo.text}</p>
-              </ReactstrapNavLink> */}
             </li>
           </Nav>
         </div>

@@ -7,17 +7,17 @@ class Footer extends React.Component {
     return (
       <footer className="footer">
         <Container fluid>
-          <Nav>
+          {/* <Nav>
             <NavItem>
-              <NavLink ><a href="http://localhost:6000" target="_blank">Contact Us</a></NavLink>
+              <NavLink > New</NavLink>
             </NavItem>
             <NavItem>
-              <NavLink ><a href="http://localhost:6000" target="_blank">Return Policy </a></NavLink>
+              <NavLink >About Us</NavLink>
             </NavItem>
             <NavItem>
-              <NavLink ><a href="http://localhost:6000" target="_blank">FAQs  </a></NavLink>
+              <NavLink>Blog</NavLink>
             </NavItem>
-          </Nav>
+          </Nav> */}
         </Container>
       </footer>
     );

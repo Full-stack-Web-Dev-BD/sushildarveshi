@@ -5,13 +5,6 @@ import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import Footer from "components/Footer/Footer.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
 import routes from "routes.js";
-import { setInitialData,logout } from '../../store/actions/authAction'
-import {loadTransection} from '../../store/actions/transectionAction'
-import logo from "assets/img/react-logo.png";
-import loading from "assets/img/loading.gif";
-import bell from "assets/img/bell.gif";
-import { connect } from "react-redux";
-import JwtDecode from "jwt-decode";
 
 var ps;
 
@@ -24,14 +17,16 @@ class Admin extends React.Component {
         document.documentElement.className.indexOf("nav-open") !== -1
     };
   }
+  
+  logout() {
+    window.localStorage.removeItem('load-token')
+    window.location.href = '/login'
+  }
   componentDidMount() {
     let token = window.localStorage.getItem('load-token')
     if (token) {
-      let decoded = JwtDecode(token)
-      this.props.setInitialData(decoded)
-      this.props.loadTransection()
     }else{
-      this.props.logout(this.props.history)
+      this.logout()
     }
     document.body.classList.add("white-content");
     if (navigator.platform.indexOf("Win") > -1) {
@@ -109,9 +104,9 @@ class Admin extends React.Component {
             bgColor={this.state.backgroundColor}
             logo={{
               outterLink: "/admin/dashbard",
-              text: Object.keys(this.props.filteredTransection.filteredTransection).length<1?' Loading ... ':'LOAD',
-              imgSrc: Object.keys(this.props.filteredTransection.filteredTransection).length<1?loading:logo,
-              loadingSrc: Object.keys(this.props.filteredTransection.filteredTransection).length<1?bell:logo,
+              text:'App Title',
+              imgSrc: '',
+              loadingSrc: ''
             }}
             toggleSidebar={this.toggleSidebar}
           />
@@ -140,8 +135,4 @@ class Admin extends React.Component {
     );
   }
 }
-const mapStateToProps = state => ({
-  auth: state.auth,
-  filteredTransection:state.transection
-})
-export default connect(mapStateToProps, { setInitialData,logout ,loadTransection})(Admin);
+export default Admin

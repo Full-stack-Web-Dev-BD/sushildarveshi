@@ -10,12 +10,15 @@ import {
   Row,
   Col,
 } from "reactstrap";
-
 import OuterNavbar from "components/Navbars/OuterNavbar";
 import Axios from "axios";
 import { Link } from "react-router-dom";
-import { login } from '../store/actions/authAction'
-import { connect } from "react-redux";
+import jwtDecoder from 'jwt-decode'
+
+import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
+import { GOOGLE_CLIENT_ID, FACEBOOK_CLIENT_ID } from "config";
+
 class Login extends React.Component {
   state = {
     email: '',
@@ -25,10 +28,10 @@ class Login extends React.Component {
 
   componentDidMount() {
     document.body.classList.add("white-content");
-    
+
     let token = window.localStorage.getItem('load-token')
     if (token) {
-      window.location.href='/admin/dashboard'
+      window.location.href = '/admin/dashboard'
     }
   }
   setBgChartData = name => {
@@ -36,13 +39,6 @@ class Login extends React.Component {
       bigChartData: name
     });
   };
-  static  getDerivedStateFromProps(nextProps, prevState) {
-    if (JSON.stringify(nextProps.auth.error) !== JSON.stringify(prevState.error)) {
-      return {
-        error: nextProps.auth.error
-      }
-    }
-  }
   changeHandler = (e) => {
     this.setState({
       [e.target.name]: e.target.value
@@ -51,13 +47,51 @@ class Login extends React.Component {
   submitHandler = (e) => {
     e.preventDefault()
     let { email, password } = this.state
-    this.props.login({ email, password }, this.props.history)
+    Axios.post('/login', { email, password })
+      .then(res => {
+        let decoded = jwtDecoder(res.data.token)
+        window.localStorage.setItem('load-token', res.data.token)
+        window.location.href = '/admin/dashboard'
+      })
+      .catch(err => {
+        this.setState({
+          error: err.response.data
+        })
+      })
   }
-
+  responseGoogle = (res) => {
+    Axios.post('/googleLogin', {
+      name: res.profileObj.name,
+      email: res.profileObj.email
+    })
+      .then(response => {
+        console.log(res, ' response')
+        window.localStorage.setItem('load-token', response.data.token)
+        window.location.href = '/admin/dashboard'
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }
+  responseFacebook = (res) => {
+    console.log(res, ' from facebook')
+    Axios.post('/googleLogin', {
+      name: res.name,
+      email: res.email
+    })
+      .then(response => {
+        console.log('response')
+        window.localStorage.setItem('load-token', response.data.token)
+        window.location.href = '/admin/dashboard'
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }
   render() {
     return (
       <div>
-        {/* <OuterNavbar /> */}
+        <OuterNavbar />
         <div className="row mt-5">
           <div className="col-md-6 offset-md-3">
             <Col xs="12">
@@ -99,6 +133,22 @@ class Login extends React.Component {
                   </div>
                   <Button onClick={e => { this.submitHandler(e) }} color="info" size="sm" className="mt-3" ><span style={{ fontWeight: '300' }}>Login</span> </Button>
                   <p className="mt-3 text-center">Not have account ? <Link to='/signup'>Sign up now </Link> </p>
+                  <div className="text-center">
+                    <GoogleLogin
+                      clientId={GOOGLE_CLIENT_ID}
+                      buttonText="Sign up with Google "
+                      onSuccess={this.responseGoogle}
+                      onFailure={this.responseGoogle}
+                      cookiePolicy={'single_host_origin'}
+                    />
+                    <div className="p-2"></div>
+                    <FacebookLogin
+                      appId={FACEBOOK_CLIENT_ID}
+                      autoLoad={false}
+                      fields="name,email,picture"
+                      onClick={() => { console.log('clicked') }}
+                      callback={this.responseFacebook} />
+                  </div>
                 </CardBody>
               </Card>
             </Col>
@@ -108,7 +158,4 @@ class Login extends React.Component {
     );
   }
 }
-const mapStateToProps = state => ({
-  auth: state.auth
-})
-export default connect(mapStateToProps, { login })(Login);
+export default Login;

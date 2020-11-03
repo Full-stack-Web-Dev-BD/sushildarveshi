@@ -1,5 +1,6 @@
 import React from "react";
 import classNames from "classnames";
+import decoder from 'jwt-decode'
 import {
   Collapse,
   DropdownToggle,
@@ -15,20 +16,32 @@ import {
   Container,
   Modal
 } from "reactstrap";
-import { connect } from "react-redux";
-import {logout}from '../../store/actions/authAction'
-
+import Axios from "axios";
 class AdminNavbar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       collapseOpen: false,
       modalSearch: false,
-      color: "navbar-transparent"
+      color: "navbar-transparent",
+      user: {}
     };
   }
   componentDidMount() {
     window.addEventListener("resize", this.updateColor);
+    let token = window.localStorage.getItem('load-token')
+    if (token) {
+      let userData = decoder(token)
+      Axios.get(`/single-user/${userData._id}`)
+        .then(res => {
+          this.setState({
+            user: res.data
+          })
+        })
+        .catch(err => {
+          return console.log(err);
+        })
+    }
   }
   componentWillUnmount() {
     window.removeEventListener("resize", this.updateColor);
@@ -63,8 +76,9 @@ class AdminNavbar extends React.Component {
       modalSearch: !this.state.modalSearch
     });
   };
-  logout(){
-    this.props.logout(this.props.history)
+  logout() {
+    window.localStorage.removeItem('load-token')
+    window.location.href = '/login'
   }
   render() {
     return (
@@ -111,41 +125,7 @@ class AdminNavbar extends React.Component {
             <Collapse navbar isOpen={this.state.collapseOpen}>
               <Nav className="ml-auto" navbar>
                 <InputGroup className="search-bar">
-                  {/* <Button
-                    color="link"
-                    data-target="#searchModal"
-                    data-toggle="modal"
-                    id="search-button"
-                    onClick={this.toggleModalSearch}
-                  >
-                    <i className="tim-icons icon-zoom-split" />
-                    <span className="d-lg-none d-md-block">Search</span>
-                  </Button> */}
                 </InputGroup>
-                {/* <UncontrolledDropdown nav>
-                  <DropdownToggle
-                    caret
-                    color="default"
-                    data-toggle="dropdown"
-                    nav
-                  >
-                    <div className="notification d-none d-lg-block d-xl-block" />
-                    <i className="tim-icons icon-bell-55" />
-                    <p className="d-lg-none">Notifications</p>
-                  </DropdownToggle>
-                  <DropdownMenu className="dropdown-navbar" right tag="ul">
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        Mike John responded to your email
-                      </DropdownItem>
-                    </NavLink>
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        You have 5 more tasks
-                      </DropdownItem>
-                    </NavLink>
-                  </DropdownMenu>
-                </UncontrolledDropdown> */}
                 <UncontrolledDropdown nav>
                   <DropdownToggle
                     caret
@@ -155,11 +135,12 @@ class AdminNavbar extends React.Component {
                     onClick={e => e.preventDefault()}
                   >
                     <div className="photo">
+                      {console.log(this.state)}
                       {
-                        this.props.auth.user.pp?
-                      <img alt="..." src={require(`../../../uploads/${this.props.auth.user.pp}`)} />
-                        :
-                      <img alt="..." src={require("assets/img/default-avatar.png")} />
+                        this.state.user.pp ?
+                          <img alt="..." src={`/uploads/${this.state.user.pp}`} />
+                          :
+                          <img alt="..." src={require("assets/img/default-avatar.png")} />
                       }
                     </div>
                     <b className="caret d-none d-lg-block d-xl-block" />
@@ -167,11 +148,11 @@ class AdminNavbar extends React.Component {
                   </DropdownToggle>
                   <DropdownMenu className="dropdown-navbar" right tag="ul">
                     <NavLink tag="li">
-                      <DropdownItem style={{cursor:'pointer'}}  onClick={e=>this.props.history.push('/admin/profile')} className="nav-item">Profile</DropdownItem>
-                    </NavLink> 
+                      <DropdownItem style={{ cursor: 'pointer' }} onClick={e => this.props.history.push('/admin/profile')} className="nav-item">Profile</DropdownItem>
+                    </NavLink>
                     <DropdownItem divider tag="li" />
                     <NavLink tag="li">
-                      <DropdownItem  style={{cursor:'pointer'}} onClick={e=>this.logout()} className="nav-item">Log out</DropdownItem>
+                      <DropdownItem style={{ cursor: 'pointer' }} onClick={e => this.logout()} className="nav-item">Log out</DropdownItem>
                     </NavLink>
                   </DropdownMenu>
                 </UncontrolledDropdown>
@@ -202,9 +183,4 @@ class AdminNavbar extends React.Component {
     );
   }
 }
-const mapStateToProps = (state, ownProps) => {
-  return {
-    auth: state.auth
-  }
-}
-export default connect(mapStateToProps, {logout})(AdminNavbar);
+export default AdminNavbar;
