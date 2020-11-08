@@ -1,5 +1,6 @@
 const transectionRouter=require('express').Router()
 const transectionController=require('../controller/transectionController')
+const cart=require('../controller/Chart')
 
 
 
@@ -10,6 +11,8 @@ transectionRouter.post('/delete',transectionController.delete)
 transectionRouter.get('/filter',transectionController.filterTransectionByMonth)
 
 
+
+transectionRouter.get('/getchart',cart.getAllUser)
 
 
 

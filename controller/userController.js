@@ -2,10 +2,6 @@ const customValidator = require('../validator/customValidator')
 const userModel = require('../model/userModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const Store = require('../model/Store')
-const LocationModel = require('../model/Location')
-const Category = require('../model/Category')
-
 
 const register = (req, res) => {
     const verify = customValidator.registerValidator(req)
@@ -289,120 +285,6 @@ const updateGoogleProfile = (req, res) => {
         return res.status(400).json({ newPassword: "For Update password New password is required" })
     }
 }
-const createStore = (req, res) => {
-    new Store({
-        name: req.body.name
-    })
-        .save()
-        .then(saved => {
-            return res.status(200).json({ message: "Created" })
-        })
-        .catch(err => {
-            return res.status(500).json({ message: "server error " })
-        })
-}
-const deleteStore = (req, res) => {
-    Store.findByIdAndDelete(req.params.id)
-        .then(deleted => {
-            return res.status(200).json({ message: "Deleted" })
-        })
-        .catch(err => {
-            return res.status(500).json({ message: "Error" })
-        })
-}
-const getStores = (req, res) => {
-    Store.find({})
-        .then(stores => {
-            return res.json(stores)
-        })
-        .catch(err => {
-            return res.status(500).json({ message: 'server error occurd ' })
-        })
-}
-const addLocation = (req, res) => {
-    new LocationModel({
-        uid: req.body.uid,
-        street: req.body.street,
-        number: req.body.number,
-        neighborhood: req.body.neighborhood,
-        country: req.body.country
-    })
-        .save()
-        .then(saved => {
-            console.log(saved);
-            return res.json({ message: "Created" })
-        })
-        .catch(err => {
-            console.log(err);
-            return res.status(500).json({ message: "Error" })
-        })
-}
-
-const getSingleLocation = (req, res) => {
-    LocationModel.findOne({ uid: req.body.id })
-        .then(loc => {
-            console.log(loc);
-            return res.status(200).json(loc)
-        })
-        .catch(err => {
-            return res.status(500).json({ message: "Server error " })
-        })
-}
-
-
-
-// Category manage APIs
-
-const createCategory = (req, res) => {
-    new Category({
-        name: req.body.name
-    })
-        .save()
-        .then(saved => {
-            return res.status(200).json({ message: "Created" })
-        })
-        .catch(err => {
-            return res.status(500).json({ message: "server error " })
-        })
-}
-const deleteCategory = (req, res) => {
-    Category.findByIdAndDelete(req.params.id)
-        .then(deleted => {
-            return res.status(200).json({ message: "Deleted" })
-        })
-        .catch(err => {
-            return res.status(500).json({ message: "Error" })
-        })
-}
-const getCategory = (req, res) => {
-    Category.find({})
-        .then(category => {
-            return res.json(category)
-        })
-        .catch(err => {
-            return res.status(500).json({ message: 'server error occurd ' })
-        })
-}
-
-const updateLocation = (req, res) => {
-    LocationModel.findOne({ _id: req.body.id })
-        .then(loc => {
-            loc.street = req.body.street,
-                loc.number = req.body.number,
-                loc.neighborhood = req.body.neighborhood,
-                loc.country = req.body.country
-            loc.save()
-                .then(updated => {
-                    return res.status(200).json({ message: "UPdated" })
-                })
-                .catch(err => {
-                    return res.status(500).json({ message: "Server err" })
-                })
-        })
-        .catch(err => {
-            return res.status(500).json({ message: "Server err" })
-        })
-}
 module.exports = {
     getAllUser,
     getSingleUser,
@@ -412,19 +294,6 @@ module.exports = {
     googleLogin,
     updateGoogleProfile,
     toggleAccess,
-
-
-    createStore,
-    deleteStore,
-    getStores,
-    addLocation,
-    getSingleLocation,
-
-    createCategory,
-    deleteCategory,
-    getCategory,
-
-    updateLocation
 }
 
 // thiagowehbe@gmail.com

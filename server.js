@@ -10,11 +10,15 @@ const userRouter = require('./router/userRouter')
 const transection = require('./router/transection')
 const path = require('path')
 const userModel = require('./model/userModel')
-const morgan=require('morgan')
+var XLSX = require('xlsx');
+const Product = require('./model/Product')
+const ProductGroupModel = require('./model/ProductGroupModel')
+const e = require('express')
 
 
 
-app.use(morgan('dev'))
+
+
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -22,7 +26,7 @@ app.use(bodyParser.json())
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './client/public/uploads')
+        cb(null, './client/uploads/')
     },
     filename: function (req, file, cb) {
         cb(null, Date.now().toString() + file.originalname)
@@ -44,7 +48,6 @@ const upload2 = multer({ storage: storage2 })
 
 
 app.use(userRouter)
-app.use(transection)
 app.post('/send-email', upload2.single('file'), (req, res) => {
     mailer(
         req.body.from,
@@ -73,6 +76,62 @@ app.post('/uploadPP', upload.single('file'), (req, res) => {
         })
 })
 
+app.post('/upload-product', upload2.single('file'), (req, res) => {
+    var workbook = XLSX.readFile(`./uploads/${req.file.filename}`, { cellDates: true });
+    var sheet_name_list = workbook.SheetNames;
+    let result = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]])
+
+    async function importToDB() {
+        // let pushDb = result.map(async element => {
+        //     await new Product({
+        //         productCode: element['Product Code'],
+        //         description: element.Description,
+        //         productGroupCode: element['Product Group Code'],
+        //         MOQ: element.MOQ,
+        //         status: element.Status,
+        //         catalogCode: element.CatalogCode
+        //     })
+        //         .save()
+        //         .then(doc => {
+        //             // console.log('added');
+        //         })
+        //         .catch(err => {
+        //             return console.log(err);
+        //         })
+        // })
+        let createProductGroup=result.map(async el=>{            
+            // await ProductGroupModel.findOne({ productGroupCode: el['Product Group Code'] })
+            await ProductGroupModel.findOne({ productGroupCode: el['Product Group Code'] })
+                .then(productGroup => {
+                    let =[]
+                    console.log(productGroup);
+
+                    // if (productGroup) {
+                    //     console.log('Existing Grup');
+                    // } else {
+                    //      new ProductGroupModel({
+                    //         productGroupCode: el['Product Group Code']
+                    //     }).save()
+                    //         .then(doc => {
+                    //             // console.log('added');
+                    //         })
+                    //         .catch(err => {
+                    //             return console.log(err);
+                    //         })
+                    // }
+                })
+                .catch(err => {
+                    return console.log(err);
+                })
+        })
+        await Promise.all(createProductGroup)
+        // await Promise.all(pushDb)
+        // console.log('done');
+        return res.status(200).json({ message: "Product Uploaded" })
+    }
+    importToDB()
+})
+
 app.use("/uploads", express.static("uploads"));
 
 app.use(express.static(path.join(__dirname, './client/build')));
@@ -82,12 +141,23 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, (req, res) => {
     console.log('Server started on port ', PORT)
-    // mongoos.connect('mongodb+srv://user:user@mern.a77ou.mongodb.net/app-db?retryWrites=true&w=majority', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
-        mongoos.connect('mongodb://localhost/hn5', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
+    // mongoos.connect('mongodb+srv://user:user@mern.a77ou.mongodb.net/loadapplication?retryWrites=true&w=majority', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
+    mongoos.connect('mongodb://localhost/material-business', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
         if (err) {
             console.log(err)
             return
         }
         console.log('Mongodb  connected')
+        ProductGroupModel.find()
+        .then(groups=>{
+            if(groups.length<1){
+                new ProductGroupModel({})
+                .save()
+                .then(doc=>{})
+                .catch(err=>{
+                    console.log(err);
+                })
+            }
+        })
     }))
 })
