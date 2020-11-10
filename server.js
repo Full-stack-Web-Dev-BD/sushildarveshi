@@ -14,6 +14,8 @@ var XLSX = require('xlsx');
 const Product = require('./model/Product')
 const ProductGroupModel = require('./model/ProductGroupModel')
 const e = require('express')
+const { update } = require('./model/userModel')
+const ProductCatalogModel = require('./model/ProductCatalogModel')
 
 
 
@@ -82,51 +84,95 @@ app.post('/upload-product', upload2.single('file'), (req, res) => {
     let result = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]])
 
     async function importToDB() {
-        // let pushDb = result.map(async element => {
-        //     await new Product({
-        //         productCode: element['Product Code'],
-        //         description: element.Description,
-        //         productGroupCode: element['Product Group Code'],
-        //         MOQ: element.MOQ,
-        //         status: element.Status,
-        //         catalogCode: element.CatalogCode
-        //     })
-        //         .save()
-        //         .then(doc => {
-        //             // console.log('added');
-        //         })
-        //         .catch(err => {
-        //             return console.log(err);
-        //         })
-        // })
-        let createProductGroup=result.map(async el=>{            
-            // await ProductGroupModel.findOne({ productGroupCode: el['Product Group Code'] })
-            await ProductGroupModel.findOne({ productGroupCode: el['Product Group Code'] })
-                .then(productGroup => {
-                    let =[]
-                    console.log(productGroup);
-
-                    // if (productGroup) {
-                    //     console.log('Existing Grup');
-                    // } else {
-                    //      new ProductGroupModel({
-                    //         productGroupCode: el['Product Group Code']
-                    //     }).save()
-                    //         .then(doc => {
-                    //             // console.log('added');
-                    //         })
-                    //         .catch(err => {
-                    //             return console.log(err);
-                    //         })
-                    // }
+        let pushDb = result.map(async element => {
+            await new Product({
+                productCode: element['Product Code'],
+                description: element.Description,
+                productGroupCode: element['Product Group Code'],
+                MOQ: element.MOQ,
+                status: element.Status,
+                catalogCode: element.CatalogCode
+            })
+                .save()
+                .then(doc => {
+                    // console.log('added');
                 })
                 .catch(err => {
                     return console.log(err);
                 })
         })
-        await Promise.all(createProductGroup)
-        // await Promise.all(pushDb)
-        // console.log('done');
+        await Promise.all(pushDb)
+
+        ProductGroupModel.findOne()
+            .then(doc => {
+                let existingGroup = doc.productGroup
+                let updatedGroup = [...existingGroup]
+
+                function mapAndPush() {
+                    result.map(async el => {
+                        if (updatedGroup.findIndex(group => (el['Product Group Code'] === group.groupName)) === -1) {
+                            console.log('pushed');
+                            updatedGroup.push({ groupName: el['Product Group Code'], description: '' })
+                        } else {
+                            // console.log('existing group');
+                        }
+                    })
+                    ProductGroupModel.findOne()
+                        .then(doc => {
+                            doc.productGroup = updatedGroup
+                            doc.save()
+                                .then(updated => {
+                                    // return console.log(updated);
+                                })
+                                .catch(err => {
+                                    return console.log(err);
+                                })
+                        })
+
+                        .catch(err => {
+                            return console.log(err);
+                        })
+                }
+                mapAndPush()
+            })
+            .catch(err => {
+                return console.log(err);
+            })
+            
+        ProductCatalogModel.findOne()
+        .then(doc => {
+            let existingcatalog = doc.catalog
+            let updatedcatalog = [...existingcatalog]
+
+            function mapAndPushCatalog() {
+                result.map(async el => {
+                    if (updatedcatalog.findIndex(catalog => (el.CatalogCode === catalog.catalogName)) === -1) {
+                        updatedcatalog.push({ catalogName: el.CatalogCode, description: '' })
+                    } else {
+                        console.log('existing catalog');
+                    }
+                })
+                ProductCatalogModel.findOne()
+                    .then(doc => {
+                        doc.catalog = updatedcatalog
+                        doc.save()
+                            .then(updated => {
+                                return console.log(updated);
+                            })
+                            .catch(err => {
+                                return console.log(err);
+                            })
+                    })
+
+                    .catch(err => {
+                        return console.log(err);
+                    })
+            }
+            mapAndPushCatalog()
+        })
+        .catch(err => {
+            return console.log(err);
+        })
         return res.status(200).json({ message: "Product Uploaded" })
     }
     importToDB()
@@ -149,15 +195,38 @@ app.listen(PORT, (req, res) => {
         }
         console.log('Mongodb  connected')
         ProductGroupModel.find()
-        .then(groups=>{
-            if(groups.length<1){
-                new ProductGroupModel({})
-                .save()
-                .then(doc=>{})
-                .catch(err=>{
-                    console.log(err);
-                })
-            }
-        })
+            .then(groups => {
+                if (groups.length < 1) {
+                    new ProductGroupModel({})
+                        .save()
+                        .then(doc => {
+                            console.log('created group');
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
+
+        ProductCatalogModel.find()
+            .then(catalog => {
+                if (catalog.length < 1) {
+                    new ProductCatalogModel({})
+                        .save()
+                        .then(doc => {
+                            console.log('created group');
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }))
 })
+
