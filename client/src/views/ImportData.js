@@ -39,81 +39,6 @@ class ImportData extends React.Component {
     })
   }
   componentDidMount() {
-    Axios.get('/getStores')
-      .then(res => {
-        console.log(res.data)
-        this.setState({
-          store: res.data
-        })
-      })
-      .catch(err => {
-        console.log(err)
-      })
-
-    Axios.get('/getCategory')
-      .then(res => {
-        this.setState({
-          categorys: res.data
-        })
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
-  submitHandler() {
-    Axios.post('/create', {
-      date: this.state.date,
-      customerName: this.state.customerName,
-      productName: this.state.productName,
-      price: this.state.price,
-      description: this.state.description,
-      store: this.state.storeN,
-      category: this.state.category
-    })
-      .then(res => {
-        window.location.href = '/admin/tables'
-      })
-      .catch(err => {
-        console.log(err);
-      })
-  }
-  deleteStore(id) {
-    Axios.get(`/deleteStore/${id}`)
-      .then(res => {
-        this.componentDidMount()
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
-  createStore() {
-    Axios.post('/createStore', { name: this.state.storeName })
-      .then(res => {
-        window.location.reload()
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
-
-
-  deleteCategory(id) {
-    Axios.get(`/deleteCategory/${id}`)
-      .then(res => {
-        this.componentDidMount()
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
-  createCategory() {
-    Axios.post('/createCategory', { name: this.state.categoryName })
-      .then(res => {
-        window.location.reload()
-      })
-      .catch(err => {
-        console.log(err)
-      })
   }
   render() {
     return (
@@ -289,7 +214,6 @@ class ImportData extends React.Component {
                 </CardBody>
               </Card>
             </Col>
-
           </Row>
         </div>
       </>

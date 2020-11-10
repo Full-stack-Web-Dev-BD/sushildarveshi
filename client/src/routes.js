@@ -3,6 +3,7 @@ import Dashboard from "views/Dashboard.js";
 import Icons from "views/Icons.js";
 import ImportData from "views/ImportData";
 import TableList from "views/TableList.js";
+import TaskManagement from "views/TaskManagement/TaskManagement";
 import Transection from "views/Transection";
 import UserProfile from "views/UserProfile.js";
 import Users from "views/Users";
@@ -12,7 +13,7 @@ const token = window.localStorage.getItem('load-token')
 let user = token?  JwtDecode(token):{}
 
 
-var userRoute = [
+var adminRoute = [
   
   {
     path: "/dashboard",
@@ -42,9 +43,24 @@ var userRoute = [
     icon: "tim-icons icon-notes",
     component: TableList,
     layout: "/admin"
-  }
+  },
+  {
+    path: "/taskManagement",
+    name: "Task Management",
+    icon: "tim-icons icon-caps-small",
+    component: TaskManagement,
+    layout: "/admin"
+  },  
+
+  {
+    path: "/icons",
+    name: "Test Page 1",
+    icon: "tim-icons icon-atom",
+    component: Icons,
+    layout: "/admin"
+  },
 ];
-var adminRoute = [
+var userRoute = [
   {
     path: "/users",
     name: "Users",
@@ -66,14 +82,6 @@ var adminRoute = [
     component: UserProfile,
     layout: "/admin"
   },
-
-  // {
-  //   path: "/icons",
-  //   name: "Test Page 1",
-  //   icon: "tim-icons icon-atom",
-  //   component: Icons,
-  //   layout: "/admin"
-  // },
 ];
 
 

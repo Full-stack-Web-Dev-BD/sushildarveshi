@@ -7,20 +7,17 @@ const cors = require('cors')
 const multer = require('multer')
 const mailer = require('./mailer')
 const userRouter = require('./router/userRouter')
-const transection = require('./router/transection')
 const path = require('path')
 const userModel = require('./model/userModel')
 var XLSX = require('xlsx');
 const Product = require('./model/Product')
 const ProductGroupModel = require('./model/ProductGroupModel')
-const e = require('express')
-const { update } = require('./model/userModel')
 const ProductCatalogModel = require('./model/ProductCatalogModel')
+const ProductRouter =require('./router/productRouter')
+const morgan =require('morgan')
 
 
-
-
-
+app.use(morgan('dev'))
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -50,6 +47,7 @@ const upload2 = multer({ storage: storage2 })
 
 
 app.use(userRouter)
+app.use(ProductRouter)
 app.post('/send-email', upload2.single('file'), (req, res) => {
     mailer(
         req.body.from,
