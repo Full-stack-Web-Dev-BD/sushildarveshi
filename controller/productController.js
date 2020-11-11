@@ -24,6 +24,33 @@ module.exports={
         .then(productCatalog=>{
             return res.json(productCatalog)
         })
-        .catch(err=>console.log(err))
+        .catch(err=>{
+            console.log(err)
+            return res.status(500).json({massage:"Server err"})
+        })
     },
+    updateProduct(req,res){
+        Product.findByIdAndUpdate({_id:req.params.id},req.body)
+        .then(doc=>{
+            return res.json(doc)
+        })
+        .catch(err=>{
+            console.log(err);
+            return res.status(500).json({massage:"Server err"})
+        })
+    },
+
+
+
+
+
+    deleteProduct(req,res){
+        Product.findByIdAndDelete(req.params.id)
+        .then(doc=>{
+            return res.json(doc)
+        })
+        .catch(err=>{
+            return res.status(500).json({massage:"Server err"})
+        })
+    }
 }

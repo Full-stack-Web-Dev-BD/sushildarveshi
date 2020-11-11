@@ -22,13 +22,12 @@ const ProductCreateModal = (props) => {
 
     const submitHandler=()=>{
         let obj={
-            state:this.state.state,
-            productCode:this.state.productCode,
-            description:this.state.description,
-            productGroupCode:this.state.productGroupCode,
-            MOQ:this.state.MOQ,
-            status:this.state.status,
-            catalogCode:this.state.catalogCode
+            productCode:productCode,
+            description:description,
+            productGroupCode:productGroupCode,
+            MOQ:MOQ,
+            status:status,
+            catalogCode:catalogCode
         }
         Axios.post('/createProduct',obj)
         .then(res=>{

@@ -4,7 +4,7 @@ import Icons from "views/Icons.js";
 import ImportData from "views/ImportData";
 import TableList from "views/TableList.js";
 import TaskManagement from "views/TaskManagement/TaskManagement";
-import Transection from "views/Transection";
+import Transection from "views/Transection/Transection";
 import UserProfile from "views/UserProfile.js";
 import Users from "views/Users";
 

@@ -18,7 +18,22 @@ class TaskManagement extends React.Component {
   state = {
     allProduct: []
   }
-  componentDidMount() {
+  delete = (id) => {
+
+    let permission = window.confirm('Are you sure to do delete this  ? ')
+    if (permission) {
+      Axios.delete(`/deleteProduct/${id}`)
+        .then(res => {
+          this.getAll()
+        })
+        .catch(err => {
+          return console.log(err);
+        })
+    } else {
+      console.log('Deny');
+    }
+  }
+  getAll = () => {
     Axios.get('/getAllProduct')
       .then(res => {
         console.log(res.data.length);
@@ -29,6 +44,9 @@ class TaskManagement extends React.Component {
       .catch(err => {
         return console.log(err);
       })
+  }
+  componentDidMount() {
+    this.getAll()
   }
   changeHandler(e) {
     this.setState({
@@ -81,7 +99,7 @@ class TaskManagement extends React.Component {
                                 <td>{el.MOQ}</td>
                                 <td>{el.status}</td>
                                 <td>{el.catalogCode}</td>
-                                <td > <i style={{cursor:'pointer'}} className="tim-icons icon-trash-simple" ></i> <ProductUpdateModal/> </td>
+                                <td > <i onClick={e => this.delete(el._id)} style={{ cursor: 'pointer' }} className="tim-icons icon-trash-simple" ></i> <ProductUpdateModal productInfo={el} getAll={this.getAll} /> </td>
                               </tr>
                             )
                           })
