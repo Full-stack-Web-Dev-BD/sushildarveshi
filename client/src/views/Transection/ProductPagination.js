@@ -176,8 +176,7 @@ export class ProductPagination extends PureComponent {
                             {/* PRODUCT CODE,	DESCRIPTION,	PRODUCT GROUP CODE,	MOQ,	STATUS	CATALOG CODE,	ACTION */}
                                 <th>PRODUCT CODE </th>
                                 <th>Product</th>
-                                <th>MRP</th>
-                                <th>CLP</th>
+                                <th>Price</th>
                                 <th>MOQ</th>
                                 <th>Quota</th>
                                 <th>Qty </th>
@@ -191,8 +190,7 @@ export class ProductPagination extends PureComponent {
                                         <tr>
                                             <td>{ el.productCode} </td>
                                             <td>Product </td>
-                                            <td> mrp </td>
-                                            <td>clp</td>
+                                            <td> MRP </td>
                                             <td> {el.MOQ} </td>
                                             <td>quota</td>
                                             <td><input type="number" placeholder="QTY" style={{width:'70px ',border:"0", borderBottom:'1px solid '}} /></td>

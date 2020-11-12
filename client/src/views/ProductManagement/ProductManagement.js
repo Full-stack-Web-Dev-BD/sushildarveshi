@@ -9,14 +9,16 @@ import {
   CardTitle,
   Table,
   Row,
-  Col
+  Col,
+  Button
 } from "reactstrap";
 import ProductCreateModal from "./ProductCreateModal";
 import ProductUpdateModal from "./ProductUpdateModal";
 
-class TaskManagement extends React.Component {
+class ProductManagement extends React.Component {
   state = {
-    allProduct: []
+    allProduct: [],
+    file:{}
   }
   delete = (id) => {
 
@@ -53,6 +55,23 @@ class TaskManagement extends React.Component {
       [e.target.name]: e.target.value
     })
   }
+  filechangeHandler(event){
+    let permission = window.confirm('Are you sure to Upload Product from  this XLSX ? ')
+    if(permission){
+      let  data=new FormData 
+      data.append('file',event.target.files[0])
+      Axios.post('/upload-product',data)
+      .then(res=>{
+        this.getAll()
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    }else{
+      
+    }
+
+  }
   render() {
     return (
       <>
@@ -63,16 +82,17 @@ class TaskManagement extends React.Component {
                 <CardHeader>
                   <CardTitle tag="h2">All  Product   ({this.state.allProduct.length}) </CardTitle>
                   <div className="d-flex">
+                    <Button size="sm" onClick={e => document.getElementById('selectXlsx').click()}>Upload  From Xls</Button>
                     <ReactHTMLTableToExcel
-                      className="btn btn-danger btn-sm mr-3"
+                      className="btn btn-danger btn-sm mr-3 ml-3"
                       table="emp"
                       filename="ReportExcel"
                       sheet="Sheet"
                       buttonText="Download as XLS" />
-                    <ProductCreateModal />
+                    <ProductCreateModal getAll={this.getAll} />
+                    <input onChange={event=>this.filechangeHandler(event)} style={{ display: 'none' }} type="file" accept=".xls,.xlsx" id="selectXlsx" />
                   </div>
                 </CardHeader>
-
                 <CardBody>
                   <div className="table-full-width table-responsive">
                     <Table id="emp" className="tablesorter" responsive>
@@ -116,4 +136,4 @@ class TaskManagement extends React.Component {
     );
   }
 }
-export default TaskManagement;
+export default ProductManagement;

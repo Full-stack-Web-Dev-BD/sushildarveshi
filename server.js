@@ -80,9 +80,13 @@ app.post('/upload-product', upload2.single('file'), (req, res) => {
     var workbook = XLSX.readFile(`./uploads/${req.file.filename}`, { cellDates: true });
     var sheet_name_list = workbook.SheetNames;
     let result = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]])
-
     async function importToDB() {
         let pushDb = result.map(async element => {
+            
+            if(!element['Product Code'] || !element['Product Group Code'] ||  !element.CatalogCode){
+                console.log('not added ');
+                // return res.sendStatus(400)
+            }else{
             await new Product({
                 productCode: element['Product Code'],
                 description: element.Description,
@@ -93,19 +97,18 @@ app.post('/upload-product', upload2.single('file'), (req, res) => {
             })
                 .save()
                 .then(doc => {
-                    // console.log('added');
+                    console.log('added');
                 })
                 .catch(err => {
                     return console.log(err);
                 })
+            }
         })
         await Promise.all(pushDb)
-
         ProductGroupModel.findOne()
             .then(doc => {
                 let existingGroup = doc.productGroup
                 let updatedGroup = [...existingGroup]
-
                 function mapAndPush() {
                     result.map(async el => {
                         if (updatedGroup.findIndex(group => (el['Product Group Code'] === group.groupName)) === -1) {
@@ -171,9 +174,11 @@ app.post('/upload-product', upload2.single('file'), (req, res) => {
         .catch(err => {
             return console.log(err);
         })
-        return res.status(200).json({ message: "Product Uploaded" })
+
     }
     importToDB()
+    return res.status(200).json({ message: "Product Uploaded" })
+
 })
 
 app.use("/uploads", express.static("uploads"));
@@ -185,8 +190,8 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, (req, res) => {
     console.log('Server started on port ', PORT)
-    mongoos.connect('mongodb+srv://user:user@mern.a77ou.mongodb.net/loadapplication?retryWrites=true&w=majority', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
-    // mongoos.connect('mongodb://localhost/material-business', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
+    // mongoos.connect('mongodb+srv://user:user@mern.a77ou.mongodb.net/loadapplication?retryWrites=true&w=majority', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
+    mongoos.connect('mongodb://localhost/material-business', { useFindAndModify: false, useUnifiedTopology: true, useNewUrlParser: true }, (err => {
         if (err) {
             console.log(err)
             return

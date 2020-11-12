@@ -7,7 +7,8 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input } from 'react
 const ProductCreateModal = (props) => {
     const {
         buttonLabel,
-        className
+        className,
+        getAll
     } = props;
     const [productCode, setproductCode] = useState('')
     const [description, setdescription] = useState('')
@@ -20,7 +21,8 @@ const ProductCreateModal = (props) => {
     const toggle = () => setModal(!modal);
 
 
-    const submitHandler=()=>{
+    const submitHandler=(e)=>{
+        e.preventDefault()
         let obj={
             productCode:productCode,
             description:description,
@@ -32,6 +34,7 @@ const ProductCreateModal = (props) => {
         Axios.post('/createProduct',obj)
         .then(res=>{
             toggle()
+            getAll()
         })
         .catch(err=>{
             console.log(err);
@@ -45,14 +48,14 @@ const ProductCreateModal = (props) => {
             <Modal isOpen={modal} toggle={toggle} className={className}>
                 <ModalHeader toggle={toggle}>Create Product </ModalHeader>
                 <ModalBody>
-                    <form className="row">
+                    <form className="row" onSubmit={e=>submitHandler(e)}>
                         <div className="col-md-6">
                             <label>Product Code</label>
                             <Input type="text" required onChange={e => setproductCode(e.target.value)} placeholder="Product Code" />
                         </div>
                         <div className="col-md-6">
                             <label>Description</label>
-                            <Input type="text" required onChange={e => setdescription(e.target.value)} placeholder="Description" />
+                            <Input type="text"  onChange={e => setdescription(e.target.value)} placeholder="Description" />
                         </div>
                         <div className="col-md-6">
                             <label>Product Group Code</label>
@@ -60,11 +63,11 @@ const ProductCreateModal = (props) => {
                         </div>
                         <div className="col-md-6">
                             <label>MOQ</label>
-                            <Input type="text" required onChange={e => setMOQ(e.target.value)} placeholder="MOQ" />
+                            <Input type="number"  required onChange={e => setMOQ(e.target.value)} placeholder="MOQ" />
                         </div>
                         <div className="col-md-6">
                             <label>Status</label>
-                            <Input type="text" required onChange={e => setstatus(e.target.value)} placeholder="Status" />
+                            <Input type="text"  onChange={e => setstatus(e.target.value)} placeholder="Status" />
                         </div>
                         <div className="col-md-6">
                             <label>Catalog Code</label>

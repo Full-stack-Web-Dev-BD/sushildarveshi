@@ -1,9 +1,10 @@
 import JwtDecode from "jwt-decode";
+import CatalogAndProductGroup from "views/Catalog&ProductGroup/Catalog&ProductGroupManagement";
 import Dashboard from "views/Dashboard.js";
 import Icons from "views/Icons.js";
 import ImportData from "views/ImportData";
+import ProductManagement from "views/ProductManagement/ProductManagement";
 import TableList from "views/TableList.js";
-import TaskManagement from "views/TaskManagement/TaskManagement";
 import Transection from "views/Transection/Transection";
 import UserProfile from "views/UserProfile.js";
 import Users from "views/Users";
@@ -14,7 +15,6 @@ let user = token?  JwtDecode(token):{}
 
 
 var adminRoute = [
-  
   {
     path: "/dashboard",
     name: "Home",
@@ -38,17 +38,17 @@ var adminRoute = [
     layout: "/admin"
   },
   {
-    path: "/tables",
-    name: "Report",
-    icon: "tim-icons icon-notes",
-    component: TableList,
+    path: "/catalogandproductgroup",
+    name: "Catalog & Product ",
+    icon: "tim-icons icon-molecule-40",
+    component: CatalogAndProductGroup,
     layout: "/admin"
   },
   {
-    path: "/taskManagement",
-    name: "Task Management",
-    icon: "tim-icons icon-caps-small",
-    component: TaskManagement,
+    path: "/productManagement",
+    name: "Product Management",
+    icon: "tim-icons icon-gift-2",
+    component: ProductManagement,
     layout: "/admin"
   },  
 
